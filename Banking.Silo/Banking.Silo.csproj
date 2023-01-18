@@ -1,0 +1,20 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net7.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <UserSecretsId>5feb965f-b8c4-4b18-bad2-041ff96ef805</UserSecretsId>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Orleans.Persistence.AzureStorage" Version="7.0.0" />
+    <PackageReference Include="Microsoft.Orleans.Server" Version="7.0.0" />
+    <PackageReference Include="Microsoft.Orleans.Streaming.AzureStorage" Version="7.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Banking.Grains\Banking.Grains.csproj" />
+  </ItemGroup>
+
+</Project>

@@ -1,0 +1,55 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.4.33205.214
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Banking.GrainInterfaces", "Banking.GrainInterfaces\Banking.GrainInterfaces.csproj", "{21064627-0DB5-40B2-B9DB-956FD44C0F33}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Banking.Grains", "Banking.Grains\Banking.Grains.csproj", "{7C6B53B0-04F8-45D1-8956-A39C6FF43E36}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Banking.Api", "Banking.Api\Banking.Api.csproj", "{F44AD674-967D-4BFC-9F9D-5B3609BB0F4E}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Banking.Silo", "Banking.Silo\Banking.Silo.csproj", "{113B6ADA-632B-4B5C-A567-900A88E2C586}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Banking.Events", "Banking.Events\Banking.Events.csproj", "{865CC75F-B3DD-404E-857C-33D608FC0484}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Banking.Storage", "Banking.Storage\Banking.Storage.csproj", "{10A570CE-68C6-4539-A678-E7E70903C6FF}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{21064627-0DB5-40B2-B9DB-956FD44C0F33}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{21064627-0DB5-40B2-B9DB-956FD44C0F33}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{21064627-0DB5-40B2-B9DB-956FD44C0F33}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{21064627-0DB5-40B2-B9DB-956FD44C0F33}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7C6B53B0-04F8-45D1-8956-A39C6FF43E36}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7C6B53B0-04F8-45D1-8956-A39C6FF43E36}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7C6B53B0-04F8-45D1-8956-A39C6FF43E36}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7C6B53B0-04F8-45D1-8956-A39C6FF43E36}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F44AD674-967D-4BFC-9F9D-5B3609BB0F4E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F44AD674-967D-4BFC-9F9D-5B3609BB0F4E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F44AD674-967D-4BFC-9F9D-5B3609BB0F4E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F44AD674-967D-4BFC-9F9D-5B3609BB0F4E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{113B6ADA-632B-4B5C-A567-900A88E2C586}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{113B6ADA-632B-4B5C-A567-900A88E2C586}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{113B6ADA-632B-4B5C-A567-900A88E2C586}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{113B6ADA-632B-4B5C-A567-900A88E2C586}.Release|Any CPU.Build.0 = Release|Any CPU
+		{865CC75F-B3DD-404E-857C-33D608FC0484}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{865CC75F-B3DD-404E-857C-33D608FC0484}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{865CC75F-B3DD-404E-857C-33D608FC0484}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{865CC75F-B3DD-404E-857C-33D608FC0484}.Release|Any CPU.Build.0 = Release|Any CPU
+		{10A570CE-68C6-4539-A678-E7E70903C6FF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{10A570CE-68C6-4539-A678-E7E70903C6FF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{10A570CE-68C6-4539-A678-E7E70903C6FF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{10A570CE-68C6-4539-A678-E7E70903C6FF}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {1EA2DCDE-4E1A-4555-92DA-F0BC012A7D8B}
+	EndGlobalSection
+EndGlobal
