@@ -18,13 +18,13 @@ namespace Banking.Grains
         }
 
         public override async Task OnActivateAsync(CancellationToken cancellationToken)
-        {
+        {            
+            await base.OnActivateAsync(cancellationToken);
+
             string id = this.GetPrimaryKeyString();
             await this.GetStreamProvider(Constants.StreamProvider)
                 .GetStream<object>(Constants.CategoryEventsStreamNamespace, id)
                 .SubscribeAsync(OnNextAsync);
-
-            await base.OnActivateAsync(cancellationToken);
         }
 
         public async Task<KeyValuePair<int, CategoryEventsState>> ReadStateFromStorage()
@@ -42,14 +42,14 @@ namespace Banking.Grains
             CategoryEventsModel expected = new(expectedversion, State.ETag);
             AppendCategoryEventsResult result = await _eventStorage.AppendEvents(partitionKey, updates, expected);
             TransitionState(State, result.ETag);
-            return result.Success;
+            return !result.Conflict;
         }
 
         public async Task OnNextAsync(IList<SequentialItem<object>> batch)
         {
-            RaiseEvents(batch.Select(sequentialItem => sequentialItem.Item).ToList());
+            RaiseEvents(batch.Select(sequentialItem => sequentialItem.Item));
 
-            await ConfirmEvents();
+            await ConfirmEvents();            
         }
 
         private CategoryEventsPartitionKey GetPartitionKey() => new(this.GetGrainId().Key.ToString()!);

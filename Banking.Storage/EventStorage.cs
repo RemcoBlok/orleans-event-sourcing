@@ -40,8 +40,8 @@ namespace Banking.Storage
             await eventStore.CreateIfNotExistsAsync().ConfigureAwait(false);
 
             int version = expectedVersion;
-            List<EventEntity> entities = events.Select(ToEventModel)
-                .Select(@event => EventSerialization.SerializeEvent(@event, partitionKey.ToString(), ++version)).ToList();
+            IEnumerable<EventEntity> entities = events.Select(ToEventModel)
+                .Select(@event => EventSerialization.SerializeEvent(@event, partitionKey.ToString(), ++version));
 
             List<TableTransactionAction> batch = new();
             foreach (EventEntity entity in entities)

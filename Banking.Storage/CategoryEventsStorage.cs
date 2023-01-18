@@ -40,8 +40,8 @@ namespace Banking.Storage
             await eventStore.CreateIfNotExistsAsync().ConfigureAwait(false);
 
             int version = expected.Version;
-            List<EventEntity> entities = events.Select(ToEventModel)
-                .Select(@event => EventSerialization.SerializeEvent(@event, partitionKey.ToString(), ++version)).ToList();
+            IEnumerable<EventEntity> entities = events.Select(ToEventModel)
+                .Select(@event => EventSerialization.SerializeEvent(@event, partitionKey.ToString(), ++version));
 
             List<TableTransactionAction> batch = new();
             foreach (EventEntity entity in entities)
@@ -56,13 +56,13 @@ namespace Banking.Storage
             {
                 Response<IReadOnlyList<Response>> transactionResponse = await eventStore.SubmitTransactionAsync(batch).ConfigureAwait(false);
                 Response response = transactionResponse.Value[transactionResponse.Value.Count - 1];                
-                return new AppendCategoryEventsResult(true, response.Headers.ETag.ToString());
+                return new AppendCategoryEventsResult(false, response.Headers.ETag.ToString());
             }
             catch (TableTransactionFailedException e)
             {
                 if (e.Status == (int)HttpStatusCode.Conflict)
                 {
-                    return new AppendCategoryEventsResult(false, null);
+                    return new AppendCategoryEventsResult(true, null);
                 }
 
                 throw;

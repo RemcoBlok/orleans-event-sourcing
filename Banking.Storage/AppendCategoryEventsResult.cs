@@ -1,4 +1,4 @@
 ﻿namespace Banking.Storage
 {
-    public readonly record struct AppendCategoryEventsResult(bool Success, string? ETag);
+    public readonly record struct AppendCategoryEventsResult(bool Conflict, string? ETag);
 }
