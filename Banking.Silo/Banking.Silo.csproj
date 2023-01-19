@@ -15,6 +15,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Banking.Grains\Banking.Grains.csproj" />
+    <ProjectReference Include="..\Banking.Persistence.AzureStorage\Banking.Persistence.AzureStorage.csproj" />
   </ItemGroup>
 
 </Project>

@@ -14,9 +14,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Banking.Events\Banking.Events.csproj" />
     <ProjectReference Include="..\Banking.GrainInterfaces\Banking.GrainInterfaces.csproj" />
-    <ProjectReference Include="..\Banking.Storage\Banking.Storage.csproj" />
+    <ProjectReference Include="..\Banking.Persistence.Interfaces\Banking.Persistence.Interfaces.csproj" />
   </ItemGroup>
 
 </Project>

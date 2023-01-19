@@ -1,4 +1,4 @@
-﻿using Banking.Events;
+﻿using Banking.Grains.Events;
 
 namespace Banking.Grains.State
 {

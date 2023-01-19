@@ -11,9 +11,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Banking.Api", "Banking.Api\
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Banking.Silo", "Banking.Silo\Banking.Silo.csproj", "{113B6ADA-632B-4B5C-A567-900A88E2C586}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Banking.Events", "Banking.Events\Banking.Events.csproj", "{865CC75F-B3DD-404E-857C-33D608FC0484}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Banking.Persistence.Interfaces", "Banking.Persistence.Interfaces\Banking.Persistence.Interfaces.csproj", "{C648020D-6389-4277-8BF3-953ABCC3F6A0}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Banking.Storage", "Banking.Storage\Banking.Storage.csproj", "{10A570CE-68C6-4539-A678-E7E70903C6FF}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Banking.Persistence.AzureStorage", "Banking.Persistence.AzureStorage\Banking.Persistence.AzureStorage.csproj", "{43E8D4A6-6221-4FAD-9AD4-B68B9C2EEA73}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -37,14 +37,14 @@ Global
 		{113B6ADA-632B-4B5C-A567-900A88E2C586}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{113B6ADA-632B-4B5C-A567-900A88E2C586}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{113B6ADA-632B-4B5C-A567-900A88E2C586}.Release|Any CPU.Build.0 = Release|Any CPU
-		{865CC75F-B3DD-404E-857C-33D608FC0484}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{865CC75F-B3DD-404E-857C-33D608FC0484}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{865CC75F-B3DD-404E-857C-33D608FC0484}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{865CC75F-B3DD-404E-857C-33D608FC0484}.Release|Any CPU.Build.0 = Release|Any CPU
-		{10A570CE-68C6-4539-A678-E7E70903C6FF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{10A570CE-68C6-4539-A678-E7E70903C6FF}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{10A570CE-68C6-4539-A678-E7E70903C6FF}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{10A570CE-68C6-4539-A678-E7E70903C6FF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C648020D-6389-4277-8BF3-953ABCC3F6A0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C648020D-6389-4277-8BF3-953ABCC3F6A0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C648020D-6389-4277-8BF3-953ABCC3F6A0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C648020D-6389-4277-8BF3-953ABCC3F6A0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{43E8D4A6-6221-4FAD-9AD4-B68B9C2EEA73}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{43E8D4A6-6221-4FAD-9AD4-B68B9C2EEA73}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{43E8D4A6-6221-4FAD-9AD4-B68B9C2EEA73}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{43E8D4A6-6221-4FAD-9AD4-B68B9C2EEA73}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

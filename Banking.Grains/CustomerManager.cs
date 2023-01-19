@@ -1,8 +1,8 @@
-﻿using Banking.Events;
-using Banking.GrainInterfaces;
+﻿using Banking.GrainInterfaces;
 using Banking.GrainInterfaces.Commands;
+using Banking.Grains.Events;
 using Banking.Grains.State;
-using Banking.Storage;
+using Banking.Persistence.Interfaces;
 using Orleans.EventSourcing;
 using Orleans.EventSourcing.CustomStorage;
 using Orleans.Streams;

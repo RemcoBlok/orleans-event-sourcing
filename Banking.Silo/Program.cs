@@ -1,5 +1,6 @@
 using Banking.Grains;
-using Banking.Storage;
+using Banking.Persistence.AzureStorage;
+using Banking.Persistence.Interfaces;
 using Microsoft.Extensions.Azure;
 using Microsoft.Extensions.Options;
 using Orleans.Configuration;
