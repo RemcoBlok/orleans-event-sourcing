@@ -50,7 +50,7 @@ namespace Banking.Persistence.AzureStorage
                 batch.Add(new TableTransactionAction(TableTransactionActionType.Add, entity));
             }
 
-            CheckpointEntity checkpointEntity = CreateCheckpointEntity(partitionKey, version);
+            CheckpointEntity checkpointEntity = CreateCheckpointEntity(partitionKey.ToString(), version);
             AddCheckpointToBatch(batch, checkpointEntity, checkpoint);
 
             try
@@ -84,11 +84,11 @@ namespace Banking.Persistence.AzureStorage
             }
         }
 
-        private static CheckpointEntity CreateCheckpointEntity(CategoryEventsPartitionKey partitionKey, int version)
+        private static CheckpointEntity CreateCheckpointEntity(string partitionKey, int version)
         {
             return new()
             {
-                PartitionKey = partitionKey.ToString(),
+                PartitionKey = partitionKey,
                 RowKey = CheckpointRowKey,
                 Version = version
             };
