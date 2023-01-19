@@ -10,37 +10,37 @@ namespace Banking.Persistence.AzureStorage
     {
         private readonly TableServiceClient _client;
         private const string EventStoreTableName = "CategoryEvents";
-        private const string CategoryEventsRowKey = "Checkpoint";
+        private const string CheckpointRowKey = "Checkpoint";
 
         public CategoryEventsStorage(IAzureClientFactory<TableServiceClient> clientFactory)
         {
             _client = clientFactory.CreateClient("EventStorage"); ;
         }
 
-        public async Task<CategoryEventsModel> ReadEvents(CategoryEventsPartitionKey partitionKey)
+        public async Task<CheckpointModel> ReadCheckpoint(CategoryEventsPartitionKey partitionKey)
         {
             if (!await _client.TableExistsAsync(EventStoreTableName).ConfigureAwait(false))
             {
-                return new CategoryEventsModel(0, null);
+                return new CheckpointModel(0, null);
             }
 
             TableClient table = _client.GetTableClient(EventStoreTableName);
 
-            NullableResponse<CategoryEventsEntity> response = await table.GetEntityIfExistsAsync<CategoryEventsEntity>(partitionKey.ToString(), CategoryEventsRowKey);
+            NullableResponse<CheckpointEntity> response = await table.GetEntityIfExistsAsync<CheckpointEntity>(partitionKey.ToString(), CheckpointRowKey);
             if (response.HasValue)
             {
-                return new CategoryEventsModel(response.Value.Count, response.Value.ETag.ToString());
+                return new CheckpointModel(response.Value.Version, response.Value.ETag.ToString());
             }
 
-            return new CategoryEventsModel(0, null);
+            return new CheckpointModel(0, null);
         }
 
-        public async Task<AppendCategoryEventsResult> AppendEvents(CategoryEventsPartitionKey partitionKey, IReadOnlyList<object> events, CategoryEventsModel expected)
+        public async Task<AppendCategoryEventsResult> AppendEvents(CategoryEventsPartitionKey partitionKey, IReadOnlyList<object> events, CheckpointModel checkpoint)
         {
             TableClient eventStore = _client.GetTableClient(EventStoreTableName);
             await eventStore.CreateIfNotExistsAsync().ConfigureAwait(false);
 
-            int version = expected.Version;
+            int version = checkpoint.Version;
             IEnumerable<EventEntity> entities = events.Select(ToEventModel)
                 .Select(@event => @event.SerializeEvent(partitionKey.ToString(), ++version));
 
@@ -50,14 +50,15 @@ namespace Banking.Persistence.AzureStorage
                 batch.Add(new TableTransactionAction(TableTransactionActionType.Add, entity));
             }
 
-            CategoryEventsEntity categoryEventsEntity = CreateCategoryEventsEntity(partitionKey, version);
-            AddCategoryEventsEntityToBatch(batch, categoryEventsEntity, expected);
+            CheckpointEntity checkpointEntity = CreateCheckpointEntity(partitionKey, version);
+            AddCheckpointToBatch(batch, checkpointEntity, checkpoint);
 
             try
             {
                 Response<IReadOnlyList<Response>> transactionResponse = await eventStore.SubmitTransactionAsync(batch).ConfigureAwait(false);
-                Response response = transactionResponse.Value[transactionResponse.Value.Count - 1];
-                return new AppendCategoryEventsResult(false, response.Headers.ETag.ToString());
+
+                Response checkpointResponse = transactionResponse.Value[^1];
+                return new AppendCategoryEventsResult(false, checkpointResponse.Headers.ETag.ToString());
             }
             catch (TableTransactionFailedException e)
             {
@@ -70,26 +71,26 @@ namespace Banking.Persistence.AzureStorage
             }
         }
 
-        private static void AddCategoryEventsEntityToBatch(List<TableTransactionAction> batch, CategoryEventsEntity categoryEventsEntity, CategoryEventsModel expected)
+        private static void AddCheckpointToBatch(List<TableTransactionAction> batch, CheckpointEntity checkpointEntity, CheckpointModel checkpoint)
         {
-            if (string.IsNullOrEmpty(expected.ETag))
+            if (string.IsNullOrEmpty(checkpoint.ETag))
             {
-                batch.Add(new TableTransactionAction(TableTransactionActionType.Add, categoryEventsEntity));
+                batch.Add(new TableTransactionAction(TableTransactionActionType.Add, checkpointEntity));
             }
             else
             {
-                categoryEventsEntity.ETag = new ETag(expected.ETag);
-                batch.Add(new TableTransactionAction(TableTransactionActionType.UpdateReplace, categoryEventsEntity, categoryEventsEntity.ETag));
+                checkpointEntity.ETag = new ETag(checkpoint.ETag);
+                batch.Add(new TableTransactionAction(TableTransactionActionType.UpdateReplace, checkpointEntity, checkpointEntity.ETag));
             }
         }
 
-        private static CategoryEventsEntity CreateCategoryEventsEntity(CategoryEventsPartitionKey partitionKey, int version)
+        private static CheckpointEntity CreateCheckpointEntity(CategoryEventsPartitionKey partitionKey, int version)
         {
             return new()
             {
                 PartitionKey = partitionKey.ToString(),
-                RowKey = CategoryEventsRowKey,
-                Count = version
+                RowKey = CheckpointRowKey,
+                Version = version
             };
         }
 

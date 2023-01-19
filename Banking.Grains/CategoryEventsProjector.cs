@@ -30,17 +30,17 @@ namespace Banking.Grains
         public async Task<KeyValuePair<int, CategoryEventsState>> ReadStateFromStorage()
         {
             CategoryEventsPartitionKey partitionKey = GetPartitionKey();
-            CategoryEventsModel result = await _eventStorage.ReadEvents(partitionKey);
+            CheckpointModel checkpoint = await _eventStorage.ReadCheckpoint(partitionKey);
             CategoryEventsState state = new();
-            TransitionState(state, result.ETag);
-            return new(result.Version, state);
+            TransitionState(state, checkpoint.ETag);
+            return new(checkpoint.Version, state);
         }
 
         public async Task<bool> ApplyUpdatesToStorage(IReadOnlyList<object> updates, int expectedversion)
         {
             CategoryEventsPartitionKey partitionKey = GetPartitionKey();
-            CategoryEventsModel expected = new(expectedversion, State.ETag);
-            AppendCategoryEventsResult result = await _eventStorage.AppendEvents(partitionKey, updates, expected);
+            CheckpointModel checkpoint = new(expectedversion, State.ETag);
+            AppendCategoryEventsResult result = await _eventStorage.AppendEvents(partitionKey, updates, checkpoint);
             TransitionState(State, result.ETag);
             return !result.Conflict;
         }

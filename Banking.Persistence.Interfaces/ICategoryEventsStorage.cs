@@ -2,7 +2,7 @@
 {
     public interface ICategoryEventsStorage
     {
-        Task<CategoryEventsModel> ReadEvents(CategoryEventsPartitionKey partitionKey);
-        Task<AppendCategoryEventsResult> AppendEvents(CategoryEventsPartitionKey partitionKey, IReadOnlyList<object> events, CategoryEventsModel expected);
+        Task<CheckpointModel> ReadCheckpoint(CategoryEventsPartitionKey partitionKey);
+        Task<AppendCategoryEventsResult> AppendEvents(CategoryEventsPartitionKey partitionKey, IReadOnlyList<object> events, CheckpointModel checkpoint);
     }
 }
