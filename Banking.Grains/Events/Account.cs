@@ -2,5 +2,5 @@
 {
     [Immutable]
     [GenerateSerializer]
-    public record Account(bool IsPrimaryAccount, string AccountType, string AccountNumber, decimal Balance);
+    public record Account(bool IsPrimaryAccount, string AccountType, string AccountNumber);
 }

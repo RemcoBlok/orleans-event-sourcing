@@ -1,6 +1,4 @@
-﻿using System.Text.Json.Serialization;
-
-namespace Banking.Grains.State
+﻿namespace Banking.GrainInterfaces.Projections
 {
     [Immutable]
     [GenerateSerializer]

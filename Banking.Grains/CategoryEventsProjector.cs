@@ -1,5 +1,4 @@
 ﻿using Banking.GrainInterfaces;
-using Banking.Grains.State;
 using Banking.Persistence.Interfaces;
 using Orleans.EventSourcing;
 using Orleans.EventSourcing.CustomStorage;
@@ -8,13 +7,14 @@ using Orleans.Streams;
 namespace Banking.Grains
 {
     [ImplicitStreamSubscription(Constants.CategoryEventsStreamNamespace)]
-    public class CategoryEventsProjector : JournaledGrain<CategoryEventsState>, ICategoryEventsProjector, ICustomStorageInterface<CategoryEventsState, object>
+    public class CategoryEventsProjector : JournaledGrain<object>, ICategoryEventsProjector, ICustomStorageInterface<object, object>
     {
-        private readonly ICategoryEventsStorage _eventStorage;
+        private readonly ICategoryEventsStorage _storage;
+        private string? _etag;
         
-        public CategoryEventsProjector(ICategoryEventsStorage eventStorage)
+        public CategoryEventsProjector(ICategoryEventsStorage storage)
         {
-            _eventStorage = eventStorage;
+            _storage = storage;
         }
 
         public override async Task OnActivateAsync(CancellationToken cancellationToken)
@@ -27,21 +27,21 @@ namespace Banking.Grains
                 .SubscribeAsync(OnNextAsync);
         }
 
-        public async Task<KeyValuePair<int, CategoryEventsState>> ReadStateFromStorage()
+        public async Task<KeyValuePair<int, object>> ReadStateFromStorage()
         {
             CategoryEventsPartitionKey partitionKey = GetPartitionKey();
-            CheckpointModel checkpoint = await _eventStorage.ReadCheckpoint(partitionKey);
-            CategoryEventsState state = new();
-            TransitionState(state, checkpoint.ETag);
+            CheckpointModel checkpoint = await _storage.ReadCheckpoint(partitionKey);
+            object state = new();
+            _etag = checkpoint.ETag;
             return new(checkpoint.Version, state);
         }
 
         public async Task<bool> ApplyUpdatesToStorage(IReadOnlyList<object> updates, int expectedversion)
         {
             CategoryEventsPartitionKey partitionKey = GetPartitionKey();
-            CheckpointModel checkpoint = new(expectedversion, State.ETag);
-            AppendCategoryEventsResult result = await _eventStorage.AppendEvents(partitionKey, updates, checkpoint);
-            TransitionState(State, result.ETag);
+            CheckpointModel checkpoint = new(expectedversion, _etag);
+            Result result = await _storage.AppendEvents(partitionKey, updates, checkpoint);
+            _etag =  result.ETag;
             return !result.Conflict;
         }
 

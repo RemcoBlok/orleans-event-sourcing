@@ -1,38 +1,31 @@
-﻿namespace Banking.Grains.State
-{
-    public class Person
-    {
-        public required string FullName { get; init; }
-        public required string FirstName { get; init; }
-        public required string LastName { get; init; }
-        public required Address Residence { get; init; }
-        public required string TaxId { get; init; }
-        public required DateOnly DateOfBirth { get; init; }
+﻿using System.Text.Json.Serialization;
 
+namespace Banking.Grains.State
+{
+    [Immutable]
+    [GenerateSerializer]
+    public record Person(string FullName, string FirstName, string LastName, Address Residence, string TaxId, DateOnly DateOfBirth)
+    {
         public Person UpdateResidence(Address residence)
         {
-            return new Person
-            {
-                FullName = FullName,
-                FirstName = FirstName,
-                LastName = LastName,
-                Residence = residence,
-                TaxId = TaxId,
-                DateOfBirth = DateOfBirth,
-            };
+            return new(
+                FullName,
+                FirstName,
+                LastName,
+                residence,
+                TaxId,
+                DateOfBirth);
         }
 
         public Person UpdateResidence(Events.Address residence)
         {
-            return UpdateResidence(new Address
-            {
-                Street = residence.Street,
-                Street2 = residence.Street2,
-                City = residence.City,
-                StateOrProvince = residence.StateOrProvince,
-                Country = residence.Country,
-                PostalCode = residence.PostalCode
-            });
+            return UpdateResidence(new Address(
+                residence.Street,
+                residence.Street2,
+                residence.City,
+                residence.StateOrProvince,
+                residence.Country,
+                residence.PostalCode));
         }
     }
 }

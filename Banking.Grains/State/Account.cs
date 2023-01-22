@@ -1,20 +1,18 @@
-﻿namespace Banking.Grains.State
-{
-    public class Account
-    {
-        public required bool IsPrimaryAccount { get; init; }
-        public required string AccountType { get; init; }
-        public required string AccountNumber { get; init; }
-        public required decimal Balance { get; init; }
+﻿using System.Text.Json.Serialization;
 
+namespace Banking.Grains.State
+{
+    [Immutable]
+    [GenerateSerializer]
+    public record Account(bool IsPrimaryAccount, string AccountType, string AccountNumber, decimal Balance)
+    {
         public Account UpdateBalance(decimal amount)
         {
-            return new Account { 
-                IsPrimaryAccount = IsPrimaryAccount,
-                AccountType = AccountType,
-                AccountNumber = AccountNumber,
-                Balance = Balance + amount
-            };
+            return new(
+                IsPrimaryAccount,
+                AccountType,
+                AccountNumber,
+                Balance + amount);
         }
     }
 }

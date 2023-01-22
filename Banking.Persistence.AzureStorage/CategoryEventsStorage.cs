@@ -9,7 +9,7 @@ namespace Banking.Persistence.AzureStorage
     public class CategoryEventsStorage : ICategoryEventsStorage
     {
         private readonly TableServiceClient _client;
-        private const string EventStoreTableName = "CategoryEvents";
+        private const string TableName = "CategoryEvents";
         private const string CheckpointRowKey = "Checkpoint";
 
         public CategoryEventsStorage(IAzureClientFactory<TableServiceClient> clientFactory)
@@ -19,25 +19,25 @@ namespace Banking.Persistence.AzureStorage
 
         public async Task<CheckpointModel> ReadCheckpoint(CategoryEventsPartitionKey partitionKey)
         {
-            if (!await _client.TableExistsAsync(EventStoreTableName).ConfigureAwait(false))
+            if (!await _client.TableExistsAsync(TableName).ConfigureAwait(false))
             {
-                return new CheckpointModel(0, null);
+                return new(0, null);
             }
 
-            TableClient table = _client.GetTableClient(EventStoreTableName);
+            TableClient table = _client.GetTableClient(TableName);
 
             NullableResponse<CheckpointEntity> response = await table.GetEntityIfExistsAsync<CheckpointEntity>(partitionKey.ToString(), CheckpointRowKey);
             if (response.HasValue)
             {
-                return new CheckpointModel(response.Value.Version, response.Value.ETag.ToString());
+                return new(response.Value.Version, response.Value.ETag.ToString());
             }
 
-            return new CheckpointModel(0, null);
+            return new(0, null);
         }
 
-        public async Task<AppendCategoryEventsResult> AppendEvents(CategoryEventsPartitionKey partitionKey, IReadOnlyList<object> events, CheckpointModel checkpoint)
+        public async Task<Result> AppendEvents(CategoryEventsPartitionKey partitionKey, IReadOnlyList<object> events, CheckpointModel checkpoint)
         {
-            TableClient eventStore = _client.GetTableClient(EventStoreTableName);
+            TableClient eventStore = _client.GetTableClient(TableName);
             await eventStore.CreateIfNotExistsAsync().ConfigureAwait(false);
 
             int version = checkpoint.Version;
@@ -58,13 +58,13 @@ namespace Banking.Persistence.AzureStorage
                 Response<IReadOnlyList<Response>> transactionResponse = await eventStore.SubmitTransactionAsync(batch).ConfigureAwait(false);
 
                 Response checkpointResponse = transactionResponse.Value[^1];
-                return new AppendCategoryEventsResult(false, checkpointResponse.Headers.ETag.ToString());
+                return new(false, checkpointResponse.Headers.ETag.ToString());
             }
-            catch (TableTransactionFailedException e)
+            catch (RequestFailedException e)
             {
                 if (e.Status == (int)HttpStatusCode.Conflict)
                 {
-                    return new AppendCategoryEventsResult(true, null);
+                    return new(true, null);
                 }
 
                 throw;
@@ -96,10 +96,10 @@ namespace Banking.Persistence.AzureStorage
 
         private static EventModel ToEventModel(object data)
         {
-            return new EventModel
+            return new()
             {
                 Data = data,
-                Metadata = new EventMetadata
+                Metadata = new()
                 {
                     TypeName = data.GetType().GetSimpleAssemblyQualifiedName()
                 }

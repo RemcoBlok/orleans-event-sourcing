@@ -1,4 +1,5 @@
-﻿using Azure.Data.Tables;
+﻿using Azure;
+using Azure.Data.Tables;
 using Banking.Persistence.Interfaces;
 using Microsoft.Extensions.Azure;
 using System.Net;
@@ -8,7 +9,7 @@ namespace Banking.Persistence.AzureStorage
     public class EventStorage : IEventStorage
     {
         private readonly TableServiceClient _client;
-        private const string EventStoreTableName = "EventStore";
+        private const string TableName = "EventStore";
 
         public EventStorage(IAzureClientFactory<TableServiceClient> clientFactory)
         {
@@ -17,12 +18,12 @@ namespace Banking.Persistence.AzureStorage
 
         public async Task<IReadOnlyList<object>> ReadEvents(EventPartitionKey partitionKey)
         {
-            if (!await _client.TableExistsAsync(EventStoreTableName).ConfigureAwait(false))
+            if (!await _client.TableExistsAsync(TableName).ConfigureAwait(false))
             {
                 return Array.Empty<object>();
             }
 
-            TableClient table = _client.GetTableClient(EventStoreTableName);
+            TableClient table = _client.GetTableClient(TableName);
 
             return await table.QueryAsync<EventEntity>(e => e.PartitionKey == partitionKey.ToString())
                 .Select(EventSerialization.DeserializeEvent)
@@ -37,7 +38,7 @@ namespace Banking.Persistence.AzureStorage
                 return true;
             }
 
-            TableClient eventStore = _client.GetTableClient(EventStoreTableName);
+            TableClient eventStore = _client.GetTableClient(TableName);
             await eventStore.CreateIfNotExistsAsync().ConfigureAwait(false);
 
             int version = expectedVersion;
@@ -55,7 +56,7 @@ namespace Banking.Persistence.AzureStorage
                 await eventStore.SubmitTransactionAsync(batch).ConfigureAwait(false);
                 return true;
             }
-            catch (TableTransactionFailedException e)
+            catch (RequestFailedException e)
             {
                 if (e.Status == (int)HttpStatusCode.Conflict)
                 {
@@ -68,10 +69,10 @@ namespace Banking.Persistence.AzureStorage
 
         private static EventModel ToEventModel(object data)
         {
-            return new EventModel
+            return new()
             {
                 Data = data,
-                Metadata = new EventMetadata
+                Metadata = new()
                 {
                     TypeName = data.GetType().GetSimpleAssemblyQualifiedName()
                 }

@@ -9,6 +9,7 @@ WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(o =>
 {
+    o.CustomSchemaIds(type => type.FullName);
     o.MapType<DateOnly>(() => new OpenApiSchema
     {
         Type = "string",
@@ -93,6 +94,22 @@ app.MapPost("/postTransaction", async (PostTransactionCommand command, IClusterC
     await customerManager.PostTransaction(command);
 })
 .WithName("PostTransaction")
+.WithOpenApi();
+
+app.MapGet("/getCustomer", async (string customerId, IClusterClient clusterClient) =>
+{
+    ICustomerProjector customerProjector = clusterClient.GetGrain<ICustomerProjector>(customerId);
+    return await customerProjector.GetProjection();
+})
+.WithName("GetCustomer")
+.WithOpenApi();
+
+app.MapGet("/getCustomers", async (IClusterClient clusterClient) =>
+{
+    ICustomersProjector customersProjector = clusterClient.GetGrain<ICustomersProjector>(Constants.AllKey);
+    return await customersProjector.GetProjection();
+})
+.WithName("GetCustomers")
 .WithOpenApi();
 
 app.Run();

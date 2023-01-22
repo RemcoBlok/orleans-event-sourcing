@@ -9,108 +9,52 @@ using Orleans.Streams;
 
 namespace Banking.Grains
 {
-    public class CustomerManager : JournaledGrain<CustomerState>, ICustomerManager, ICustomStorageInterface<CustomerState, object>
+    public class CustomerManager : JournaledGrain<CustomerManagerState>, ICustomerManager, ICustomStorageInterface<CustomerManagerState, object>
     {
-        private readonly IEventStorage _eventStorage;
-        private IAsyncStream<object>? _stream;
+        private readonly IEventStorage _storage;
+        private IAsyncStream<object>? _categoryEventsStream;
+        private IAsyncStream<object>? _customerStream;
+        private IAsyncStream<object>? _customersStream;
 
-        public CustomerManager(IEventStorage eventStorage)
+        public CustomerManager(IEventStorage storage)
         {
-            _eventStorage = eventStorage;
+            _storage = storage;
         }
 
         public async Task CreateCustomer(CreateCustomerCommand command)
         {
             RaiseEvent(new CustomerCreatedEvent(
                 command.CustomerId,
-                new Events.Person(
-                    command.PrimaryAccountHolder.FullName,
-                    command.PrimaryAccountHolder.FirstName,
-                    command.PrimaryAccountHolder.LastName,
-                    new Events.Address(
-                        command.PrimaryAccountHolder.Residence.Street,
-                        command.PrimaryAccountHolder.Residence.Street2,
-                        command.PrimaryAccountHolder.Residence.City,
-                        command.PrimaryAccountHolder.Residence.StateOrProvince,
-                        command.PrimaryAccountHolder.Residence.Country,
-                        command.PrimaryAccountHolder.Residence.PostalCode),
-                    command.PrimaryAccountHolder.TaxId,
-                    command.PrimaryAccountHolder.DateOfBirth),
-                new Events.Address(
-                    command.MailingAddress.Street,
-                    command.MailingAddress.Street2,
-                    command.MailingAddress.City,
-                    command.MailingAddress.StateOrProvince,
-                    command.MailingAddress.Country,
-                    command.MailingAddress.PostalCode)));
+                GetPerson(command.PrimaryAccountHolder),
+                GetAddress(command.MailingAddress)));
 
             await ConfirmEventsAndStream();
         }
 
         public async Task UpdatePrimaryAccountHolder(UpdatePrimaryAccountHolderCommand command)
         {
-            RaiseEvent(new PrimaryAccountHolderChangedEvent(
-                new Events.Person(
-                    command.PrimaryAccountHolder.FullName,
-                    command.PrimaryAccountHolder.FirstName,
-                    command.PrimaryAccountHolder.LastName,
-                    new Events.Address(
-                        command.PrimaryAccountHolder.Residence.Street,
-                        command.PrimaryAccountHolder.Residence.Street2,
-                        command.PrimaryAccountHolder.Residence.City,
-                        command.PrimaryAccountHolder.Residence.StateOrProvince,
-                        command.PrimaryAccountHolder.Residence.Country,
-                        command.PrimaryAccountHolder.Residence.PostalCode),
-                    command.PrimaryAccountHolder.TaxId,
-                    command.PrimaryAccountHolder.DateOfBirth)));
+            RaiseEvent(new PrimaryAccountHolderChangedEvent(GetPerson(command.PrimaryAccountHolder)));
 
             await ConfirmEventsAndStream();
         }
 
         public async Task UpdatePrimaryResidence(UpdatePrimaryResidenceCommand command)
         {
-            RaiseEvent(new PrimaryResidenceChangedEvent(
-                new Events.Address(
-                    command.Residence.Street,
-                    command.Residence.Street2,
-                    command.Residence.City,
-                    command.Residence.StateOrProvince,
-                    command.Residence.Country,
-                    command.Residence.PostalCode)));
+            RaiseEvent(new PrimaryResidenceChangedEvent(GetAddress(command.Residence)));
 
             await ConfirmEventsAndStream();
         }
 
         public async Task UpdateSpouse(UpdateSpouseCommand command)
         {
-            RaiseEvent(new SpouseChangedEvent(
-                new Events.Person(
-                    command.Spouse.FullName,
-                    command.Spouse.FirstName,
-                    command.Spouse.LastName,
-                    new Events.Address(
-                        command.Spouse.Residence.Street,
-                        command.Spouse.Residence.Street2,
-                        command.Spouse.Residence.City,
-                        command.Spouse.Residence.StateOrProvince,
-                        command.Spouse.Residence.Country,
-                        command.Spouse.Residence.PostalCode),
-                    command.Spouse.TaxId,
-                    command.Spouse.DateOfBirth)));
+            RaiseEvent(new SpouseChangedEvent(GetPerson(command.Spouse)));
 
             await ConfirmEventsAndStream();
         }
 
         public async Task UpdateSpouseResidence(UpdateSpouseyResidenceCommand command)
         {
-            RaiseEvent(new SpouseResidenceChangedEvent(
-                new Events.Address(
-                        command.Residence.Street,
-                        command.Residence.Street2,
-                        command.Residence.City,
-                        command.Residence.StateOrProvince,
-                        command.Residence.Country,
-                        command.Residence.PostalCode)));
+            RaiseEvent(new SpouseResidenceChangedEvent(GetAddress(command.Residence)));
 
             await ConfirmEventsAndStream();
         }
@@ -124,26 +68,14 @@ namespace Banking.Grains
 
         public async Task UpdateMailingAddress(UpdateMailingAddressCommand command)
         {
-            RaiseEvent(new MailingAddressChangedEvent(
-                new Events.Address(
-                    command.MailingAddress.Street,
-                    command.MailingAddress.Street2,
-                    command.MailingAddress.City,
-                    command.MailingAddress.StateOrProvince,
-                    command.MailingAddress.Country,
-                    command.MailingAddress.PostalCode)));
+            RaiseEvent(new MailingAddressChangedEvent(GetAddress(command.MailingAddress)));
 
             await ConfirmEventsAndStream();
         }
 
         public async Task AddAccount(AddAccountCommand command)
         {
-            RaiseEvent(new AccountAddedEvent(
-                new Events.Account(
-                    command.Account.IsPrimaryAccount,
-                    command.Account.AccountType,
-                    command.Account.AccountNumber,
-                    command.Account.Balance)));
+            RaiseEvent(new AccountAddedEvent(GetAccount(command.Account)));
 
             await ConfirmEventsAndStream();
         }
@@ -162,11 +94,11 @@ namespace Banking.Grains
             await ConfirmEventsAndStream();
         }
 
-        public async Task<KeyValuePair<int, CustomerState>> ReadStateFromStorage()
+        public async Task<KeyValuePair<int, CustomerManagerState>> ReadStateFromStorage()
         {
             EventPartitionKey partitionKey = GetPartitionKey();
-            IReadOnlyList<object> events = await _eventStorage.ReadEvents(partitionKey);
-            CustomerState state = new();
+            IReadOnlyList<object> events = await _storage.ReadEvents(partitionKey);
+            CustomerManagerState state = new();
             foreach (object @event in events)
             {
                 TransitionState(state, @event);
@@ -178,27 +110,60 @@ namespace Banking.Grains
         public async Task<bool> ApplyUpdatesToStorage(IReadOnlyList<object> updates, int expectedversion)
         {
             EventPartitionKey partitionKey = GetPartitionKey();
-            return await _eventStorage.AppendEvents(partitionKey, updates, expectedversion);
+            return await _storage.AppendEvents(partitionKey, updates, expectedversion);
         }
 
         public override Task OnActivateAsync(CancellationToken cancellationToken)
         {
-            string id = GetType().Name;
-            _stream = this.GetStreamProvider(Constants.StreamProvider)
-                .GetStream<object>(Constants.CategoryEventsStreamNamespace, id);
+            IStreamProvider provider = this.GetStreamProvider(Constants.StreamProvider);
+            _categoryEventsStream = provider.GetStream<object>(Constants.CategoryEventsStreamNamespace, nameof(CustomerManager));
+            _customerStream = provider.GetStream<object>(Constants.CustomerStreamNamespace, this.GetPrimaryKeyString());
+            _customersStream = provider.GetStream<object>(Constants.CustomersStreamNamespace, GrainInterfaces.Constants.AllKey);
 
             return base.OnActivateAsync(cancellationToken);
         }
 
-        private EventPartitionKey GetPartitionKey() => new(GetType().Name, this.GetGrainId().Key.ToString()!);
-
         private async Task ConfirmEventsAndStream()
         {
-            List<object> events = UnconfirmedEvents.ToList();
-            
+            object[] events = UnconfirmedEvents.ToArray();
+
             await ConfirmEvents();
 
-            await _stream!.OnNextBatchAsync(events);
+            await _categoryEventsStream!.OnNextBatchAsync(events);
+            await _customerStream!.OnNextBatchAsync(events);
+            await _customersStream!.OnNextBatchAsync(events);
+        }
+
+        private EventPartitionKey GetPartitionKey() => new(nameof(CustomerManager), this.GetGrainId().Key.ToString()!);
+
+        private static Events.Person GetPerson(GrainInterfaces.Commands.Person person)
+        {
+            return new(
+                person.FullName,
+                person.FirstName,
+                person.LastName,
+                GetAddress(person.Residence),
+                person.TaxId,
+                person.DateOfBirth);
+        }
+
+        private static Events.Address GetAddress(GrainInterfaces.Commands.Address address)
+        {
+            return new(
+                address.Street,
+                address.Street2,
+                address.City,
+                address.StateOrProvince,
+                address.Country,
+                address.PostalCode);
+        }
+
+        private static Events.Account GetAccount(GrainInterfaces.Commands.Account account)
+        {
+            return new(
+                account.IsPrimaryAccount,
+                account.AccountType,
+                account.AccountNumber);
         }
     }
 }

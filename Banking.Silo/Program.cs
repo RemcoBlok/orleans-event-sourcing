@@ -46,6 +46,7 @@ builder.Services.AddAzureClients(clientFactory =>
 
 builder.Services.AddTransient<IEventStorage, EventStorage>();
 builder.Services.AddTransient<ICategoryEventsStorage, CategoryEventsStorage>();
+builder.Services.AddTransient(typeof(IProjectionStorage<>), typeof(ProjectionStorage<>));
 
 WebApplication app = builder.Build();
 
