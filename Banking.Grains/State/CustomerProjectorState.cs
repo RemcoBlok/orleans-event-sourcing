@@ -103,7 +103,7 @@ namespace Banking.Grains.State
                 person.DateOfBirth);
         }
 
-        private static Address ToState(this Events.Address address)
+        private static Address ToState(Events.Address address)
         {
             return new(
                 address.Street,
