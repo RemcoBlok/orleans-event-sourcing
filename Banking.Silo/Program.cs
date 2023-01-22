@@ -4,6 +4,7 @@ using Banking.Persistence.Interfaces;
 using Microsoft.Extensions.Azure;
 using Microsoft.Extensions.Options;
 using Orleans.Configuration;
+using Orleans.Providers;
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
@@ -20,13 +21,11 @@ builder.Services.AddOrleans(silo =>
     //silo.AddAzureTableGrainStorageAsDefault((AzureTableStorageOptions options) =>
     //{
     //    options.ConfigureTableServiceClient(connectionString);
-
     //});
 
-    silo.AddAzureTableGrainStorage("PubSubStore", (AzureTableStorageOptions options) =>
+    silo.AddAzureTableGrainStorage(ProviderConstants.DEFAULT_PUBSUB_PROVIDER_NAME, (AzureTableStorageOptions options) =>
     {
         options.ConfigureTableServiceClient(connectionString);
-
     });
 
     silo.AddAzureQueueStreams(Constants.StreamProvider, (OptionsBuilder<AzureQueueOptions> optionsBuilder) =>
