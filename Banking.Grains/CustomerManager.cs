@@ -1,8 +1,10 @@
 ﻿using Banking.GrainInterfaces;
 using Banking.GrainInterfaces.Commands;
+using Banking.GrainInterfaces.Projections;
 using Banking.Grains.Events;
 using Banking.Grains.State;
 using Banking.Persistence.Interfaces;
+using Microsoft.Extensions.Logging;
 using Orleans.EventSourcing;
 using Orleans.EventSourcing.CustomStorage;
 using Orleans.Streams;
@@ -112,6 +114,12 @@ namespace Banking.Grains
                 return;
             }
 
+            State.Account account = State.Accounts.First(a => a.AccountNumber == command.AccountNumber);
+            if (account.Balance != 0m)
+            {
+                throw new InvalidOperationException("Balance not zero");
+            }
+
             RaiseEvent(new AccountRemovedEvent(command.AccountNumber));
 
             await ConfirmEventsAndStream();
@@ -122,6 +130,12 @@ namespace Banking.Grains
             if (State.Accounts.All(account => account.AccountNumber != command.AccountNumber))
             {
                 return;
+            }
+
+            State.Account account = State.Accounts.First(a => a.AccountNumber == command.AccountNumber);
+            if (account.Balance + command.Amount < 0m)
+            {
+                throw new InvalidOperationException("Transaction results in negative balance");
             }
 
             RaiseEvent(new TransactionPostedEvent(command.AccountNumber, command.Amount));
