@@ -13,7 +13,7 @@ namespace Banking.Persistence.AzureStorage
 
         public EventStorage(IAzureClientFactory<TableServiceClient> clientFactory)
         {
-            _client = clientFactory.CreateClient("EventStorage"); ;
+            _client = clientFactory.CreateClient(AzureStorageConstants.EventStorageClientName); ;
         }
 
         public async Task<IReadOnlyList<TEventBase>> ReadEvents(EventPartitionKey partitionKey)

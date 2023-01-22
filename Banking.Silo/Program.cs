@@ -39,7 +39,7 @@ builder.Services.AddOrleans(silo =>
 
 builder.Services.AddAzureClients(clientFactory =>
 {
-    clientFactory.AddTableServiceClient(connectionString).WithName("EventStorage");
+    clientFactory.AddTableServiceClient(connectionString).WithName(AzureStorageConstants.EventStorageClientName);
 });
 
 

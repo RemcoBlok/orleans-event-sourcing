@@ -14,7 +14,7 @@ namespace Banking.Persistence.AzureStorage
 
         public CategoryEventsStorage(IAzureClientFactory<TableServiceClient> clientFactory)
         {
-            _client = clientFactory.CreateClient("EventStorage"); ;
+            _client = clientFactory.CreateClient(AzureStorageConstants.EventStorageClientName); ;
         }
 
         public async Task<CheckpointModel> ReadCheckpoint(CategoryEventsPartitionKey partitionKey)

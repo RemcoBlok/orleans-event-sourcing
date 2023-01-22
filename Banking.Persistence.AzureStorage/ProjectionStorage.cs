@@ -13,7 +13,7 @@ namespace Banking.Persistence.AzureStorage
 
         public ProjectionStorage(IAzureClientFactory<TableServiceClient> clientFactory)
         {
-            _client = clientFactory.CreateClient("EventStorage"); ;
+            _client = clientFactory.CreateClient(AzureStorageConstants.EventStorageClientName); ;
         }
 
         public async Task<ProjectionModel<TState>> ReadState(string partitionKey, string rowKey)
