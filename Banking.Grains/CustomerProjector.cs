@@ -65,14 +65,14 @@ namespace Banking.Grains
         {
             return Task.FromResult<CustomerProjection>(new(
                 State.CustomerId,
-                GetPerson(State.PrimaryAccountHolder),
-                GetPerson(State.Spouse),
-                GetAddress(State.MailingAddress),
-                State.Accounts.Select(GetAccount).ToArray()));
+                ToProjection(State.PrimaryAccountHolder),
+                ToProjection(State.Spouse),
+                ToProjection(State.MailingAddress),
+                State.Accounts.Select(ToProjection).ToArray()));
         }
 
         [return: NotNullIfNotNull(nameof(person))]
-        private static GrainInterfaces.Projections.Person? GetPerson(State.Person? person)
+        private static GrainInterfaces.Projections.Person? ToProjection(State.Person? person)
         {
             if (person == null)
             {
@@ -83,13 +83,13 @@ namespace Banking.Grains
                 person.FullName,
                 person.FirstName,
                 person.LastName,
-                GetAddress(person.Residence),
+                ToProjection(person.Residence),
                 person.TaxId,
                 person.DateOfBirth);
         }
 
         [return: NotNullIfNotNull(nameof(address))]
-        private static GrainInterfaces.Projections.Address? GetAddress(State.Address? address)
+        private static GrainInterfaces.Projections.Address? ToProjection(State.Address? address)
         {
             if (address == null)
             {
@@ -105,7 +105,7 @@ namespace Banking.Grains
                 address.PostalCode);
         }
 
-        private static GrainInterfaces.Projections.Account GetAccount(State.Account account)
+        private static GrainInterfaces.Projections.Account ToProjection(State.Account account)
         {
             return new(
                 account.IsPrimaryAccount,

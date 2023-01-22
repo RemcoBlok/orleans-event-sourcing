@@ -23,44 +23,64 @@ namespace Banking.Grains
 
         public async Task CreateCustomer(CreateCustomerCommand command)
         {
+            if (State.CustomerId != null)
+            {
+                return;
+            }
+
             RaiseEvent(new CustomerCreatedEvent(
                 command.CustomerId,
-                GetPerson(command.PrimaryAccountHolder),
-                GetAddress(command.MailingAddress)));
+                ToEvent(command.PrimaryAccountHolder),
+                ToEvent(command.MailingAddress)));
 
             await ConfirmEventsAndStream();
         }
 
         public async Task UpdatePrimaryAccountHolder(UpdatePrimaryAccountHolderCommand command)
         {
-            RaiseEvent(new PrimaryAccountHolderChangedEvent(GetPerson(command.PrimaryAccountHolder)));
+            RaiseEvent(new PrimaryAccountHolderChangedEvent(ToEvent(command.PrimaryAccountHolder)));
 
             await ConfirmEventsAndStream();
         }
 
         public async Task UpdatePrimaryResidence(UpdatePrimaryResidenceCommand command)
         {
-            RaiseEvent(new PrimaryResidenceChangedEvent(GetAddress(command.Residence)));
+            if (State.PrimaryAccountHolder == null)
+            {
+                return;
+            }
+
+            RaiseEvent(new PrimaryResidenceChangedEvent(ToEvent(command.Residence)));
 
             await ConfirmEventsAndStream();
         }
 
         public async Task UpdateSpouse(UpdateSpouseCommand command)
         {
-            RaiseEvent(new SpouseChangedEvent(GetPerson(command.Spouse)));
+            RaiseEvent(new SpouseChangedEvent(ToEvent(command.Spouse)));
 
             await ConfirmEventsAndStream();
         }
 
         public async Task UpdateSpouseResidence(UpdateSpouseyResidenceCommand command)
         {
-            RaiseEvent(new SpouseResidenceChangedEvent(GetAddress(command.Residence)));
+            if (State.Spouse == null)
+            {
+                return;
+            }
+
+            RaiseEvent(new SpouseResidenceChangedEvent(ToEvent(command.Residence)));
 
             await ConfirmEventsAndStream();
         }
 
         public async Task RemoveSpouse(RemoveSpouseCommand command)
         {
+            if (State.Spouse == null)
+            {
+                return;
+            }
+
             RaiseEvent(new SpouseRemovedEvent());
 
             await ConfirmEventsAndStream();
@@ -68,20 +88,30 @@ namespace Banking.Grains
 
         public async Task UpdateMailingAddress(UpdateMailingAddressCommand command)
         {
-            RaiseEvent(new MailingAddressChangedEvent(GetAddress(command.MailingAddress)));
+            RaiseEvent(new MailingAddressChangedEvent(ToEvent(command.MailingAddress)));
 
             await ConfirmEventsAndStream();
         }
 
         public async Task AddAccount(AddAccountCommand command)
         {
-            RaiseEvent(new AccountAddedEvent(GetAccount(command.Account)));
+            if (State.Accounts.Any(account => account.AccountNumber == command.Account.AccountNumber))
+            {
+                return;
+            }
+
+            RaiseEvent(new AccountAddedEvent(ToEvent(command.Account)));
 
             await ConfirmEventsAndStream();
         }
 
         public async Task RemoveAccount(RemoveAccountCommand command)
         {
+            if (State.Accounts.All(account => account.AccountNumber != command.AccountNumber))
+            {
+                return;
+            }
+
             RaiseEvent(new AccountRemovedEvent(command.AccountNumber));
 
             await ConfirmEventsAndStream();
@@ -89,6 +119,11 @@ namespace Banking.Grains
 
         public async Task PostTransaction(PostTransactionCommand command)
         {
+            if (State.Accounts.All(account => account.AccountNumber != command.AccountNumber))
+            {
+                return;
+            }
+
             RaiseEvent(new TransactionPostedEvent(command.AccountNumber, command.Amount));
 
             await ConfirmEventsAndStream();
@@ -136,18 +171,18 @@ namespace Banking.Grains
 
         private EventPartitionKey GetPartitionKey() => new(nameof(CustomerManager), this.GetGrainId().Key.ToString()!);
 
-        private static Events.Person GetPerson(GrainInterfaces.Commands.Person person)
+        private static Events.Person ToEvent(GrainInterfaces.Commands.Person person)
         {
             return new(
                 person.FullName,
                 person.FirstName,
                 person.LastName,
-                GetAddress(person.Residence),
+                ToEvent(person.Residence),
                 person.TaxId,
                 person.DateOfBirth);
         }
 
-        private static Events.Address GetAddress(GrainInterfaces.Commands.Address address)
+        private static Events.Address ToEvent(GrainInterfaces.Commands.Address address)
         {
             return new(
                 address.Street,
@@ -158,7 +193,7 @@ namespace Banking.Grains
                 address.PostalCode);
         }
 
-        private static Events.Account GetAccount(GrainInterfaces.Commands.Account account)
+        private static Events.Account ToEvent(GrainInterfaces.Commands.Account account)
         {
             return new(
                 account.IsPrimaryAccount,

@@ -13,13 +13,13 @@ namespace Banking.Grains.State
         public void Apply(CustomerCreatedEvent @event)
         {
             CustomerId = @event.CustomerId;
-            PrimaryAccountHolder = GetPerson(@event.PrimaryAccountHolder);
-            MailingAddress = GetAddress(@event.MailingAddress);
+            PrimaryAccountHolder = ToState(@event.PrimaryAccountHolder);
+            MailingAddress = ToState(@event.MailingAddress);
         }
 
         public void Apply(PrimaryAccountHolderChangedEvent @event)
         {
-            PrimaryAccountHolder = GetPerson(@event.PrimaryAccountHolder);
+            PrimaryAccountHolder = ToState(@event.PrimaryAccountHolder);
         }
 
         public void Apply(PrimaryResidenceChangedEvent @event)
@@ -34,7 +34,7 @@ namespace Banking.Grains.State
 
         public void Apply(SpouseChangedEvent @event)
         {
-            Spouse = GetPerson(@event.Spouse);
+            Spouse = ToState(@event.Spouse);
         }
 
         public void Apply(SpouseResidenceChangedEvent @event)
@@ -54,12 +54,12 @@ namespace Banking.Grains.State
 
         public void Apply(MailingAddressChangedEvent @event)
         {
-            MailingAddress = GetAddress(@event.MailingAddress);
+            MailingAddress = ToState(@event.MailingAddress);
         }
 
         public void Apply(AccountAddedEvent @event)
         {
-            Account account = GetAccount(@event.Account);
+            Account account = ToState(@event.Account);
 
             Accounts = Accounts.Append(account).ToArray();
         }
@@ -76,18 +76,18 @@ namespace Banking.Grains.State
             Accounts = Accounts.Where(account => account.AccountNumber != @event.AccountNumber).Append(account).ToArray();
         }
 
-        private static Person GetPerson(Events.Person person)
+        private static Person ToState(Events.Person person)
         {
             return new(
                 person.FullName,
                 person.FirstName,
                 person.LastName,
-                GetAddress(person.Residence),
+                ToState(person.Residence),
                 person.TaxId,
                 person.DateOfBirth);
         }
 
-        private static Address GetAddress(Events.Address address)
+        private static Address ToState(Events.Address address)
         {
             return new(
                 address.Street,
@@ -98,7 +98,7 @@ namespace Banking.Grains.State
                 address.PostalCode);
         }
 
-        private static Account GetAccount(Events.Account account)
+        private static Account ToState(Events.Account account)
         {
             return new(
                 account.IsPrimaryAccount,
