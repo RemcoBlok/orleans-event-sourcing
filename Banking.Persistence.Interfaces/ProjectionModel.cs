@@ -1,6 +1,6 @@
 ﻿namespace Banking.Persistence.Interfaces
 {
-    public class ProjectionModel<TState>
+    public class ProjectionModel<TState> where TState : notnull
     {
         public required TState Data { get; set; }
 

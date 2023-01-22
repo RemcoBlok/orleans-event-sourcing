@@ -11,12 +11,12 @@ namespace Banking.Grains
 {
     public class CustomerManager : JournaledGrain<CustomerManagerState>, ICustomerManager, ICustomStorageInterface<CustomerManagerState, object>
     {
-        private readonly IEventStorage _storage;
+        private readonly IEventStorage<object> _storage;
         private IAsyncStream<object>? _categoryEventsStream;
         private IAsyncStream<object>? _customerStream;
         private IAsyncStream<object>? _customersStream;
 
-        public CustomerManager(IEventStorage storage)
+        public CustomerManager(IEventStorage<object> storage)
         {
             _storage = storage;
         }

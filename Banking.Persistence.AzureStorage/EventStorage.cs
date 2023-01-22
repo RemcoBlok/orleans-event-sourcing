@@ -6,7 +6,7 @@ using System.Net;
 
 namespace Banking.Persistence.AzureStorage
 {
-    public class EventStorage : IEventStorage
+    public class EventStorage<TEventBase> : IEventStorage<TEventBase> where TEventBase : notnull
     {
         private readonly TableServiceClient _client;
         private const string TableName = "EventStore";
@@ -16,22 +16,22 @@ namespace Banking.Persistence.AzureStorage
             _client = clientFactory.CreateClient("EventStorage"); ;
         }
 
-        public async Task<IReadOnlyList<object>> ReadEvents(EventPartitionKey partitionKey)
+        public async Task<IReadOnlyList<TEventBase>> ReadEvents(EventPartitionKey partitionKey)
         {
             if (!await _client.TableExistsAsync(TableName).ConfigureAwait(false))
             {
-                return Array.Empty<object>();
+                return Array.Empty<TEventBase>();
             }
 
             TableClient table = _client.GetTableClient(TableName);
 
             return await table.QueryAsync<EventEntity>(e => e.PartitionKey == partitionKey.ToString())
-                .Select(EventSerialization.DeserializeEvent)
+                .Select(EventSerialization.DeserializeEvent<TEventBase>)
                 .Select(e => e.Data)
                 .ToListAsync().ConfigureAwait(false);
         }
 
-        public async Task<bool> AppendEvents(EventPartitionKey partitionKey, IReadOnlyList<object> events, int expectedVersion)
+        public async Task<bool> AppendEvents(EventPartitionKey partitionKey, IReadOnlyList<TEventBase> events, int expectedVersion)
         {
             if (!events.Any())
             {
@@ -67,7 +67,7 @@ namespace Banking.Persistence.AzureStorage
             }
         }
 
-        private static EventModel ToEventModel(object data)
+        private static EventModel<TEventBase> ToEventModel(TEventBase data)
         {
             return new()
             {

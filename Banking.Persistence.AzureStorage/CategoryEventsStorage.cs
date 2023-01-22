@@ -6,7 +6,7 @@ using System.Net;
 
 namespace Banking.Persistence.AzureStorage
 {
-    public class CategoryEventsStorage : ICategoryEventsStorage
+    public class CategoryEventsStorage<TEventBase> : ICategoryEventsStorage<TEventBase> where TEventBase : notnull
     {
         private readonly TableServiceClient _client;
         private const string TableName = "CategoryEvents";
@@ -35,7 +35,7 @@ namespace Banking.Persistence.AzureStorage
             return new(0, null);
         }
 
-        public async Task<Result> AppendEvents(CategoryEventsPartitionKey partitionKey, IReadOnlyList<object> events, CheckpointModel checkpoint)
+        public async Task<Result> AppendEvents(CategoryEventsPartitionKey partitionKey, IReadOnlyList<TEventBase> events, CheckpointModel checkpoint)
         {
             TableClient eventStore = _client.GetTableClient(TableName);
             await eventStore.CreateIfNotExistsAsync().ConfigureAwait(false);
@@ -94,7 +94,7 @@ namespace Banking.Persistence.AzureStorage
             };
         }
 
-        private static EventModel ToEventModel(object data)
+        private static EventModel<TEventBase> ToEventModel(TEventBase data)
         {
             return new()
             {

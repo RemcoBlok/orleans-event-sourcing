@@ -13,7 +13,7 @@ namespace Banking.Persistence.AzureStorage
             DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull
         };
 
-        public static ProjectionModel<TState> DeserializeProjection<TState>(this ProjectionEntity projection)
+        public static ProjectionModel<TState> DeserializeProjection<TState>(this ProjectionEntity projection) where TState : notnull
         {
             ProjectionMetadata metadata = JsonSerializer.Deserialize<ProjectionMetadata>(projection.Metadata, Options)!;
 
@@ -27,7 +27,7 @@ namespace Banking.Persistence.AzureStorage
             };
         }
 
-        public static ProjectionEntity SerializeProjection<TState>(this ProjectionModel<TState> projection, string partitionKey, string rowKey)
+        public static ProjectionEntity SerializeProjection<TState>(this ProjectionModel<TState> projection, string partitionKey, string rowKey) where TState : notnull
         {
             TState data = projection.Data;
             ProjectionMetadata metadata = projection.Metadata;

@@ -14,25 +14,25 @@ namespace Banking.Persistence.AzureStorage
             DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull
         };
 
-        public static EventModel DeserializeEvent(this EventEntity e)
+        public static EventModel<TEventBase> DeserializeEvent<TEventBase>(this EventEntity e) where TEventBase : notnull
         {
             EventMetadata metadata = JsonSerializer.Deserialize<EventMetadata>(e.Metadata, Options)!;
 
-            object data = JsonSerializer.Deserialize(
+            TEventBase data = (TEventBase)JsonSerializer.Deserialize(
                 e.Data,
                 TypeCache.GetType(metadata.TypeName),
                 Options)!;
 
-            return new EventModel
+            return new()
             {
                 Data = data,
                 Metadata = metadata
             };
         }
 
-        public static EventEntity SerializeEvent(this EventModel @event, string partitionKey, int version)
+        public static EventEntity SerializeEvent<TEventBase>(this EventModel<TEventBase> @event, string partitionKey, int version) where TEventBase : notnull
         {
-            object data = @event.Data;
+            TEventBase data = @event.Data;
             EventMetadata metadata = @event.Metadata;
 
             return new EventEntity

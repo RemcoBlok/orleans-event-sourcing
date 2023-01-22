@@ -1,6 +1,6 @@
 ﻿namespace Banking.Persistence.Interfaces
 {
-    public interface IProjectionStorage<TState>
+    public interface IProjectionStorage<TState> where TState : notnull
     {
         Task<ProjectionModel<TState>> ReadState(string partitionKey, string rowKey);
 

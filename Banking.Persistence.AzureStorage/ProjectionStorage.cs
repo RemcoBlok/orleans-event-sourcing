@@ -6,7 +6,7 @@ using System.Net;
 
 namespace Banking.Persistence.AzureStorage
 {
-    public class ProjectionStorage<TState> : IProjectionStorage<TState> where TState : new()
+    public class ProjectionStorage<TState> : IProjectionStorage<TState> where TState : notnull, new()
     {
         private readonly TableServiceClient _client;
         private const string TableName = "Projections";

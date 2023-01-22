@@ -9,10 +9,10 @@ namespace Banking.Grains
     [ImplicitStreamSubscription(Constants.CategoryEventsStreamNamespace)]
     public class CategoryEventsProjector : JournaledGrain<object>, ICategoryEventsProjector, ICustomStorageInterface<object, object>
     {
-        private readonly ICategoryEventsStorage _storage;
+        private readonly ICategoryEventsStorage<object> _storage;
         private string? _etag;
         
-        public CategoryEventsProjector(ICategoryEventsStorage storage)
+        public CategoryEventsProjector(ICategoryEventsStorage<object> storage)
         {
             _storage = storage;
         }

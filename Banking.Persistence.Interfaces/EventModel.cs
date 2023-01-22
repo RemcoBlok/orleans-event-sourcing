@@ -1,8 +1,8 @@
 ﻿namespace Banking.Persistence.Interfaces
 {
-    public class EventModel
+    public class EventModel<TEventBase> where TEventBase : notnull
     {
-        public required object Data { get; set; }
+        public required TEventBase Data { get; set; }
 
         public required EventMetadata Metadata { get; set; }
     }
