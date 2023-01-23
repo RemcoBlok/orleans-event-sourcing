@@ -2,6 +2,7 @@
 using Banking.GrainInterfaces.Projections;
 using Banking.Grains.State;
 using Banking.Persistence.Interfaces;
+using Banking.Persistence.Interfaces.Models;
 using Orleans.EventSourcing;
 using Orleans.EventSourcing.CustomStorage;
 using Orleans.Streams;

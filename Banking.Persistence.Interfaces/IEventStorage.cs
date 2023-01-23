@@ -1,4 +1,6 @@
-﻿namespace Banking.Persistence.Interfaces
+﻿using Banking.Persistence.Interfaces.Models;
+
+namespace Banking.Persistence.Interfaces
 {
     public interface IEventStorage<TEventBase> where TEventBase : notnull
     {

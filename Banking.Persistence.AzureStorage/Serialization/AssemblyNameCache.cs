@@ -1,7 +1,7 @@
 ﻿using System.Collections.Concurrent;
 using System.Reflection;
 
-namespace Banking.Persistence.AzureStorage
+namespace Banking.Persistence.AzureStorage.Serialization
 {
     public static class AssemblyNameCache
     {

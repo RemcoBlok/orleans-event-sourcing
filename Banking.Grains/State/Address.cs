@@ -1,6 +1,4 @@
-﻿using System.Text.Json.Serialization;
-
-namespace Banking.Grains.State
+﻿namespace Banking.Grains.State
 {
     [Immutable]
     [GenerateSerializer]

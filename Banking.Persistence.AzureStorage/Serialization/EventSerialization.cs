@@ -1,9 +1,10 @@
 ﻿using System.Globalization;
 using System.Text.Json.Serialization;
 using System.Text.Json;
-using Banking.Persistence.Interfaces;
+using Banking.Persistence.Interfaces.Models;
+using Banking.Persistence.AzureStorage.Entities;
 
-namespace Banking.Persistence.AzureStorage
+namespace Banking.Persistence.AzureStorage.Serialization
 {
     internal static class EventSerialization
     {
@@ -41,6 +42,18 @@ namespace Banking.Persistence.AzureStorage
                 RowKey = version.ToString("D19", CultureInfo.InvariantCulture),
                 Data = JsonSerializer.SerializeToUtf8Bytes(data, data.GetType(), Options),
                 Metadata = JsonSerializer.SerializeToUtf8Bytes(metadata, Options)
+            };
+        }
+
+        public static EventModel<TEventBase> ToEventModel<TEventBase>(TEventBase data) where TEventBase : notnull
+        {
+            return new()
+            {
+                Data = data,
+                Metadata = new()
+                {
+                    TypeName = data.GetType().GetSimpleAssemblyQualifiedName()
+                }
             };
         }
     }

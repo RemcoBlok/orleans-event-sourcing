@@ -1,5 +1,6 @@
 ﻿using Banking.GrainInterfaces;
 using Banking.Persistence.Interfaces;
+using Banking.Persistence.Interfaces.Models;
 using Orleans.EventSourcing;
 using Orleans.EventSourcing.CustomStorage;
 using Orleans.Streams;

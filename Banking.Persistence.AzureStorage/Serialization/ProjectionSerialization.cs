@@ -1,8 +1,9 @@
 ﻿using System.Text.Json.Serialization;
 using System.Text.Json;
-using Banking.Persistence.Interfaces;
+using Banking.Persistence.Interfaces.Models;
+using Banking.Persistence.AzureStorage.Entities;
 
-namespace Banking.Persistence.AzureStorage
+namespace Banking.Persistence.AzureStorage.Serialization
 {
     internal static class ProjectionSerialization
     {
@@ -38,6 +39,19 @@ namespace Banking.Persistence.AzureStorage
                 RowKey = rowKey,
                 Data = JsonSerializer.SerializeToUtf8Bytes(data, Options),
                 Metadata = JsonSerializer.SerializeToUtf8Bytes(metadata, Options)
+            };
+        }
+
+        public static ProjectionModel<TState> ToProjectionModel<TState>(TState data, int version = 0, string? etag = null) where TState : notnull
+        {
+            return new()
+            {
+                Data = data,
+                Metadata = new()
+                {
+                    Version = version
+                },
+                ETag = etag
             };
         }
     }

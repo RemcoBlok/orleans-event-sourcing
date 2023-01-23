@@ -1,9 +1,9 @@
 ﻿using Azure.Data.Tables;
 using Azure;
 
-namespace Banking.Persistence.AzureStorage
+namespace Banking.Persistence.AzureStorage.Entities
 {
-    internal class ProjectionEntity : ITableEntity
+    internal class EventEntity : ITableEntity
     {
         public string? PartitionKey { get; set; }
         public string? RowKey { get; set; }

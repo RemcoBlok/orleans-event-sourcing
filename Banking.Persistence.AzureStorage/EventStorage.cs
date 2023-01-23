@@ -1,6 +1,9 @@
 ﻿using Azure;
 using Azure.Data.Tables;
+using Banking.Persistence.AzureStorage.Entities;
+using Banking.Persistence.AzureStorage.Serialization;
 using Banking.Persistence.Interfaces;
+using Banking.Persistence.Interfaces.Models;
 using Microsoft.Extensions.Azure;
 using System.Net;
 
@@ -42,7 +45,7 @@ namespace Banking.Persistence.AzureStorage
             await eventStore.CreateIfNotExistsAsync().ConfigureAwait(false);
 
             int version = expectedVersion;
-            IEnumerable<EventEntity> entities = events.Select(ToEventModel)
+            IEnumerable<EventEntity> entities = events.Select(EventSerialization.ToEventModel)
                 .Select(@event => @event.SerializeEvent(partitionKey.ToString(), ++version));
 
             List<TableTransactionAction> batch = new();
@@ -65,18 +68,6 @@ namespace Banking.Persistence.AzureStorage
 
                 throw;
             }
-        }
-
-        private static EventModel<TEventBase> ToEventModel(TEventBase data)
-        {
-            return new()
-            {
-                Data = data,
-                Metadata = new()
-                {
-                    TypeName = data.GetType().GetSimpleAssemblyQualifiedName()
-                }
-            };
         }
     }
 }

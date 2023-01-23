@@ -1,10 +1,9 @@
 ﻿using Banking.GrainInterfaces;
 using Banking.GrainInterfaces.Commands;
-using Banking.GrainInterfaces.Projections;
 using Banking.Grains.Events;
 using Banking.Grains.State;
 using Banking.Persistence.Interfaces;
-using Microsoft.Extensions.Logging;
+using Banking.Persistence.Interfaces.Models;
 using Orleans.EventSourcing;
 using Orleans.EventSourcing.CustomStorage;
 using Orleans.Streams;

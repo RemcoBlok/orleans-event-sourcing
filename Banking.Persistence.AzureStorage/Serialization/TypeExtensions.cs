@@ -1,6 +1,6 @@
 ﻿using System.Reflection;
 
-namespace Banking.Persistence.AzureStorage
+namespace Banking.Persistence.AzureStorage.Serialization
 {
     public static class TypeExtensions
     {

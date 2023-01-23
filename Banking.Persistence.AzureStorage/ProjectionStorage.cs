@@ -1,6 +1,9 @@
 ﻿using Azure;
 using Azure.Data.Tables;
+using Banking.Persistence.AzureStorage.Entities;
+using Banking.Persistence.AzureStorage.Serialization;
 using Banking.Persistence.Interfaces;
+using Banking.Persistence.Interfaces.Models;
 using Microsoft.Extensions.Azure;
 using System.Net;
 
@@ -20,14 +23,7 @@ namespace Banking.Persistence.AzureStorage
         {
             if (!await _client.TableExistsAsync(TableName).ConfigureAwait(false))
             {
-                return new()
-                {
-                    Data = new TState(),
-                    Metadata = new()
-                    {
-                        Version = 0
-                    }
-                };
+                return ProjectionSerialization.ToProjectionModel(new TState());
             }
 
             TableClient table = _client.GetTableClient(TableName);
@@ -38,14 +34,7 @@ namespace Banking.Persistence.AzureStorage
                 return ProjectionSerialization.DeserializeProjection<TState>(response.Value);
             }
 
-            return new()
-            {
-                Data = new TState(),
-                Metadata = new()
-                {
-                    Version = 0
-                }
-            };
+            return ProjectionSerialization.ToProjectionModel(new TState());
         }
 
         public async Task<Result> SaveState(string partitionKey, string rowKey, ProjectionModel<TState> projection)
