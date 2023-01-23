@@ -6,7 +6,6 @@ using Banking.Persistence.Interfaces.Models;
 using Orleans.EventSourcing;
 using Orleans.EventSourcing.CustomStorage;
 using Orleans.Streams;
-using System.Diagnostics.CodeAnalysis;
 
 namespace Banking.Grains
 {
@@ -66,53 +65,10 @@ namespace Banking.Grains
         {
             return Task.FromResult<CustomerProjection>(new(
                 State.CustomerId,
-                ToProjection(State.PrimaryAccountHolder),
-                ToProjection(State.Spouse),
-                ToProjection(State.MailingAddress),
-                State.Accounts.Select(ToProjection).ToArray()));
-        }
-
-        [return: NotNullIfNotNull(nameof(person))]
-        private static GrainInterfaces.Projections.Person? ToProjection(State.Person? person)
-        {
-            if (person == null)
-            {
-                return null;
-            }
-
-            return new(
-                person.FullName,
-                person.FirstName,
-                person.LastName,
-                ToProjection(person.Residence),
-                person.TaxId,
-                person.DateOfBirth);
-        }
-
-        [return: NotNullIfNotNull(nameof(address))]
-        private static GrainInterfaces.Projections.Address? ToProjection(State.Address? address)
-        {
-            if (address == null)
-            {
-                return null;
-            }
-
-            return new(
-                address.Street,
-                address.Street2,
-                address.City,
-                address.StateOrProvince,
-                address.Country,
-                address.PostalCode);
-        }
-
-        private static GrainInterfaces.Projections.Account ToProjection(State.Account account)
-        {
-            return new(
-                account.IsPrimaryAccount,
-                account.AccountType,
-                account.AccountNumber,
-                account.Balance);
+                State.PrimaryAccountHolder.ToProjection(),
+                State.Spouse.ToProjection(),
+                State.MailingAddress.ToProjection(),
+                State.Accounts.Select(ConversionExtensions.ToProjection).ToArray()));
         }
     }
 }

@@ -29,13 +29,13 @@ namespace Banking.Grains.State
         public void Apply(CustomerCreatedEvent @event)
         {
             CustomerId = @event.CustomerId;
-            PrimaryAccountHolder = ToState(@event.PrimaryAccountHolder);
-            MailingAddress = ToState(@event.MailingAddress);
+            PrimaryAccountHolder = @event.PrimaryAccountHolder.ToState();
+            MailingAddress = @event.MailingAddress.ToState();
         }
 
         public void Apply(PrimaryAccountHolderChangedEvent @event)
         {
-            PrimaryAccountHolder = ToState(@event.PrimaryAccountHolder);
+            PrimaryAccountHolder = @event.PrimaryAccountHolder.ToState();
         }
 
         public void Apply(PrimaryResidenceChangedEvent @event)
@@ -50,7 +50,7 @@ namespace Banking.Grains.State
 
         public void Apply(SpouseChangedEvent @event)
         {
-            Spouse = ToState(@event.Spouse);
+            Spouse = @event.Spouse.ToState();
         }
 
         public void Apply(SpouseResidenceChangedEvent @event)
@@ -70,12 +70,12 @@ namespace Banking.Grains.State
 
         public void Apply(MailingAddressChangedEvent @event)
         {
-            MailingAddress = ToState(@event.MailingAddress);
+            MailingAddress = @event.MailingAddress.ToState();
         }
 
         public void Apply(AccountAddedEvent @event)
         {
-            Account account = ToState(@event.Account);
+            Account account = @event.Account.ToState();
 
             Accounts = Accounts.Append(account).ToArray();
         }
@@ -90,37 +90,6 @@ namespace Banking.Grains.State
             Account account = Accounts.First(a => a.AccountNumber == @event.AccountNumber).UpdateBalance(@event.Amount);
 
             Accounts = Accounts.Where(account => account.AccountNumber != @event.AccountNumber).Append(account).ToArray();
-        }
-
-        private static Person ToState(Events.Person person)
-        {
-            return new(
-                person.FullName,
-                person.FirstName,
-                person.LastName,
-                ToState(person.Residence),
-                person.TaxId,
-                person.DateOfBirth);
-        }
-
-        private static Address ToState(Events.Address address)
-        {
-            return new(
-                address.Street,
-                address.Street2,
-                address.City,
-                address.StateOrProvince,
-                address.Country,
-                address.PostalCode);
-        }
-
-        private static Account ToState(Events.Account account)
-        {
-            return new(
-                account.IsPrimaryAccount,
-                account.AccountType,
-                account.AccountNumber,
-                0m);
         }
     }
 }
