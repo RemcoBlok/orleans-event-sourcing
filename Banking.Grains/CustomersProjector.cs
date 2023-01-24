@@ -63,12 +63,13 @@ namespace Banking.Grains
 
         public Task<CustomersProjection> GetProjection()
         {
+            CustomersProjectorState state = State;
             return Task.FromResult<CustomersProjection>(new
                 (
-                    State.CustomerCount,
-                    State.AccountCount,
-                    State.TransactionCount,
-                    State.AccountBalanceSum
+                    state.CustomerCount,
+                    state.AccountCount,
+                    state.TransactionCount,
+                    state.AccountBalanceSum
                 ));
         }
     }

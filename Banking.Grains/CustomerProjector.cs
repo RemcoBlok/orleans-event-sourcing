@@ -63,12 +63,13 @@ namespace Banking.Grains
 
         public Task<CustomerProjection> GetProjection()
         {
+            CustomerProjectorState state = State;
             return Task.FromResult<CustomerProjection>(new(
-                State.CustomerId,
-                State.PrimaryAccountHolder.ToProjection(),
-                State.Spouse.ToProjection(),
-                State.MailingAddress.ToProjection(),
-                State.Accounts.Select(ConversionExtensions.ToProjection).ToArray()));
+                state.CustomerId,
+                state.PrimaryAccountHolder.ToProjection(),
+                state.Spouse.ToProjection(),
+                state.MailingAddress.ToProjection(),
+                state.Accounts.Select(ConversionExtensions.ToProjection).ToArray()));
         }
     }
 }
