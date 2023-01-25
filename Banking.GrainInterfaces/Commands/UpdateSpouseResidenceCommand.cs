@@ -2,5 +2,5 @@
 {
     [Immutable]
     [GenerateSerializer]
-    public record UpdateSpouseyResidenceCommand(string CustomerId, Address Residence);
+    public record UpdateSpouseResidenceCommand(string CustomerId, Address Residence);
 }

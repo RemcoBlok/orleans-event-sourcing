@@ -1,23 +1,27 @@
-﻿using Banking.GrainInterfaces;
+﻿using Banking.GrainInterfaces.Hubs;
 using Banking.GrainInterfaces.Projections;
+using Banking.GrainInterfaces.Projectors;
 using Banking.Grains.State;
 using Banking.Persistence.Interfaces;
 using Banking.Persistence.Interfaces.Models;
+using Microsoft.AspNetCore.SignalR.Protocol;
 using Orleans.EventSourcing;
 using Orleans.EventSourcing.CustomStorage;
 using Orleans.Streams;
 
-namespace Banking.Grains
+namespace Banking.Grains.Projectors
 {
     [ImplicitStreamSubscription(Constants.CustomersStreamNamespace)]
     public class CustomersProjector : JournaledGrain<CustomersProjectorState>, ICustomersProjector, ICustomStorageInterface<CustomersProjectorState, object>
     {
+        private readonly SignalR.Orleans.Core.HubContext<NotificationHub> _hubContext;
         private readonly IProjectionStorage<CustomersProjectorState> _storage;
         private string? _etag;
 
-        public CustomersProjector(IProjectionStorage<CustomersProjectorState> storage)
+        public CustomersProjector(IProjectionStorage<CustomersProjectorState> storage, SignalR.Orleans.Core.HubContext<NotificationHub> hubContext)
         {
             _storage = storage;
+            _hubContext = hubContext;
         }
 
         public override async Task OnActivateAsync(CancellationToken cancellationToken)
@@ -59,6 +63,9 @@ namespace Banking.Grains
             RaiseEvents(batch.Select(sequentialItem => sequentialItem.Item));
 
             await ConfirmEvents();
+
+            InvocationMessage message = new(nameof(INotificationClient.NotifyCustomersProjectionUpdated), Array.Empty<object?>());
+            await _hubContext.Client(GrainInterfaces.Constants.NotificationGroup).Send(message);
         }
 
         public Task<CustomersProjection> GetProjection()

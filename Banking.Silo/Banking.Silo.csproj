@@ -8,9 +8,10 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.Orleans.Persistence.AzureStorage" Version="7.0.0" />
-    <PackageReference Include="Microsoft.Orleans.Server" Version="7.0.0" />
-    <PackageReference Include="Microsoft.Orleans.Streaming.AzureStorage" Version="7.0.0" />
+    <PackageReference Include="Microsoft.Orleans.Persistence.AzureStorage" Version="7.1.0" />
+    <PackageReference Include="Microsoft.Orleans.Server" Version="7.1.0" />
+    <PackageReference Include="Microsoft.Orleans.Streaming.AzureStorage" Version="7.1.0" />
+    <PackageReference Include="SignalR.Orleans" Version="7.1.0" />
   </ItemGroup>
 
   <ItemGroup>

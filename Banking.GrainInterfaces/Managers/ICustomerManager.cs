@@ -1,6 +1,6 @@
 ﻿using Banking.GrainInterfaces.Commands;
 
-namespace Banking.GrainInterfaces
+namespace Banking.GrainInterfaces.Managers
 {
     public interface ICustomerManager : IGrainWithStringKey
     {
@@ -8,7 +8,7 @@ namespace Banking.GrainInterfaces
         Task UpdatePrimaryAccountHolder(UpdatePrimaryAccountHolderCommand command);
         Task UpdatePrimaryResidence(UpdatePrimaryResidenceCommand command);
         Task UpdateSpouse(UpdateSpouseCommand command);
-        Task UpdateSpouseResidence(UpdateSpouseyResidenceCommand command);
+        Task UpdateSpouseResidence(UpdateSpouseResidenceCommand command);
         Task RemoveSpouse(RemoveSpouseCommand command);
         Task UpdateMailingAddress(UpdateMailingAddressCommand command);
         Task AddAccount(AddAccountCommand command);

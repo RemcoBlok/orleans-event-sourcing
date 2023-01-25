@@ -1,5 +1,5 @@
-﻿using Banking.GrainInterfaces;
-using Banking.GrainInterfaces.Commands;
+﻿using Banking.GrainInterfaces.Commands;
+using Banking.GrainInterfaces.Managers;
 using Banking.Grains.Events;
 using Banking.Grains.State;
 using Banking.Persistence.Interfaces;
@@ -8,7 +8,7 @@ using Orleans.EventSourcing;
 using Orleans.EventSourcing.CustomStorage;
 using Orleans.Streams;
 
-namespace Banking.Grains
+namespace Banking.Grains.Managers
 {
     public class CustomerManager : JournaledGrain<CustomerManagerState>, ICustomerManager, ICustomStorageInterface<CustomerManagerState, object>
     {
@@ -63,7 +63,7 @@ namespace Banking.Grains
             await ConfirmEventsAndStream();
         }
 
-        public async Task UpdateSpouseResidence(UpdateSpouseyResidenceCommand command)
+        public async Task UpdateSpouseResidence(UpdateSpouseResidenceCommand command)
         {
             if (State.Spouse == null)
             {

@@ -1,6 +1,12 @@
 using Banking.GrainInterfaces;
 using Banking.GrainInterfaces.Commands;
+using Banking.GrainInterfaces.Hubs;
+using Banking.GrainInterfaces.Managers;
+using Banking.GrainInterfaces.Projectors;
+using Microsoft.Extensions.Options;
 using Microsoft.OpenApi.Models;
+using Orleans.Configuration;
+using SignalR.Orleans;
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
@@ -19,7 +25,22 @@ builder.Services.AddSwaggerGen(o =>
 builder.Services.AddOrleansClient(client =>
 {
     client.UseLocalhostClustering();
+
+    //client.AddMemoryStreams(SignalROrleansConstants.SIGNALR_ORLEANS_STREAM_PROVIDER);
+
+    client.AddAzureQueueStreams(SignalROrleansConstants.SIGNALR_ORLEANS_STREAM_PROVIDER, (OptionsBuilder<AzureQueueOptions> optionsBuilder) =>
+    {
+        optionsBuilder.Configure(options =>
+        {
+            string? connectionString = builder.Configuration.GetConnectionString("AzureStorage");
+            options.ConfigureQueueServiceClient(connectionString);
+        });
+    });
+
+    client.UseSignalR(configure: null);
 });
+
+builder.Services.AddSignalR().AddOrleans();
 
 WebApplication app = builder.Build();
 
@@ -31,6 +52,8 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
+app.MapHub<NotificationHub>("/notificationHub");
 
 app.MapPost("/createCustomer", async (CreateCustomerCommand command, IClusterClient clusterClient) =>
 {
