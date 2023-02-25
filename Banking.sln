@@ -15,6 +15,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Banking.Persistence.Interfa
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Banking.Persistence.AzureStorage", "Banking.Persistence.AzureStorage\Banking.Persistence.AzureStorage.csproj", "{43E8D4A6-6221-4FAD-9AD4-B68B9C2EEA73}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Banking.Persistence.Redis", "Banking.Persistence.Redis\Banking.Persistence.Redis.csproj", "{92C25E4C-6B00-42B1-8BC8-971F56463A89}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -45,6 +47,10 @@ Global
 		{43E8D4A6-6221-4FAD-9AD4-B68B9C2EEA73}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{43E8D4A6-6221-4FAD-9AD4-B68B9C2EEA73}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{43E8D4A6-6221-4FAD-9AD4-B68B9C2EEA73}.Release|Any CPU.Build.0 = Release|Any CPU
+		{92C25E4C-6B00-42B1-8BC8-971F56463A89}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{92C25E4C-6B00-42B1-8BC8-971F56463A89}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{92C25E4C-6B00-42B1-8BC8-971F56463A89}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{92C25E4C-6B00-42B1-8BC8-971F56463A89}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

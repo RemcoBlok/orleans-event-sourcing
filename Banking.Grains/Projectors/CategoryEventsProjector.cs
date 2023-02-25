@@ -3,10 +3,12 @@ using Banking.Persistence.Interfaces;
 using Banking.Persistence.Interfaces.Models;
 using Orleans.EventSourcing;
 using Orleans.EventSourcing.CustomStorage;
+using Orleans.Providers;
 using Orleans.Streams;
 
 namespace Banking.Grains.Projectors
 {
+    [LogConsistencyProvider(ProviderName = Constants.CategoryEventStorageName)]
     [ImplicitStreamSubscription(Constants.CategoryEventsStreamNamespace)]
     public class CategoryEventsProjector : JournaledGrain<object>, ICategoryEventsProjector, ICustomStorageInterface<object, object>
     {
@@ -23,7 +25,7 @@ namespace Banking.Grains.Projectors
             await base.OnActivateAsync(cancellationToken);
 
             string id = this.GetPrimaryKeyString();
-            await this.GetStreamProvider(Constants.StreamProvider)
+            await this.GetStreamProvider(Constants.StreamProviderName)
                 .GetStream<object>(Constants.CategoryEventsStreamNamespace, id)
                 .SubscribeAsync(OnNextAsync);
         }

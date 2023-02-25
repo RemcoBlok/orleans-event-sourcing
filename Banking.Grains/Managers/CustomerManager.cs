@@ -6,10 +6,12 @@ using Banking.Persistence.Interfaces;
 using Banking.Persistence.Interfaces.Models;
 using Orleans.EventSourcing;
 using Orleans.EventSourcing.CustomStorage;
+using Orleans.Providers;
 using Orleans.Streams;
 
 namespace Banking.Grains.Managers
 {
+    [LogConsistencyProvider(ProviderName = Constants.EventStorageName)]
     public class CustomerManager : JournaledGrain<CustomerManagerState>, ICustomerManager, ICustomStorageInterface<CustomerManagerState, object>
     {
         private readonly IEventStorage<object> _storage;
@@ -163,7 +165,7 @@ namespace Banking.Grains.Managers
 
         public override Task OnActivateAsync(CancellationToken cancellationToken)
         {
-            IStreamProvider provider = this.GetStreamProvider(Constants.StreamProvider);
+            IStreamProvider provider = this.GetStreamProvider(Constants.StreamProviderName);
             _categoryEventsStream = provider.GetStream<object>(Constants.CategoryEventsStreamNamespace, nameof(CustomerManager));
             _customerStream = provider.GetStream<object>(Constants.CustomerStreamNamespace, this.GetPrimaryKeyString());
             _customersStream = provider.GetStream<object>(Constants.CustomersStreamNamespace, GrainInterfaces.Constants.AllKey);

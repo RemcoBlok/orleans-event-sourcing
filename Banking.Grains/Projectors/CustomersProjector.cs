@@ -7,10 +7,12 @@ using Banking.Persistence.Interfaces.Models;
 using Microsoft.AspNetCore.SignalR.Protocol;
 using Orleans.EventSourcing;
 using Orleans.EventSourcing.CustomStorage;
+using Orleans.Providers;
 using Orleans.Streams;
 
 namespace Banking.Grains.Projectors
 {
+    [LogConsistencyProvider(ProviderName = Constants.ProjectionStorageName)]
     [ImplicitStreamSubscription(Constants.CustomersStreamNamespace)]
     public class CustomersProjector : JournaledGrain<CustomersProjectorState>, ICustomersProjector, ICustomStorageInterface<CustomersProjectorState, object>
     {
@@ -18,10 +20,11 @@ namespace Banking.Grains.Projectors
         private readonly IProjectionStorage<CustomersProjectorState> _storage;
         private string? _etag;
 
-        public CustomersProjector(IProjectionStorage<CustomersProjectorState> storage, SignalR.Orleans.Core.HubContext<NotificationHub> hubContext)
+        public CustomersProjector(IProjectionStorage<CustomersProjectorState> storage)//, SignalR.Orleans.Core.HubContext<NotificationHub> hubContext)
         {
             _storage = storage;
-            _hubContext = hubContext;
+            //_hubContext = hubContext;
+            _hubContext = GrainFactory.GetHub<NotificationHub>();
         }
 
         public override async Task OnActivateAsync(CancellationToken cancellationToken)
@@ -29,7 +32,7 @@ namespace Banking.Grains.Projectors
             await base.OnActivateAsync(cancellationToken);
 
             string id = this.GetPrimaryKeyString();
-            await this.GetStreamProvider(Constants.StreamProvider)
+            await this.GetStreamProvider(Constants.StreamProviderName)
                 .GetStream<object>(Constants.CustomersStreamNamespace, id)
                 .SubscribeAsync(OnNextAsync);
         }
