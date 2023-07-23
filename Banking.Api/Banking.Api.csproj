@@ -8,12 +8,12 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="7.0.3" />
-    <PackageReference Include="Microsoft.Orleans.Client" Version="7.1.0" />
-    <PackageReference Include="Microsoft.Orleans.Clustering.AzureStorage" Version="7.1.0" />
-    <PackageReference Include="Microsoft.Orleans.Clustering.Redis" Version="7.1.0-beta1" />
-    <PackageReference Include="Microsoft.Orleans.Streaming.AzureStorage" Version="7.1.0" />
-    <PackageReference Include="Microsoft.Orleans.Streaming.EventHubs" Version="7.1.0" />
+    <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="7.0.9" />
+    <PackageReference Include="Microsoft.Orleans.Client" Version="7.2.1" />
+    <PackageReference Include="Microsoft.Orleans.Clustering.AzureStorage" Version="7.2.1" />
+    <PackageReference Include="Microsoft.Orleans.Clustering.Redis" Version="7.2.1" />
+    <PackageReference Include="Microsoft.Orleans.Streaming.AzureStorage" Version="7.2.1" />
+    <PackageReference Include="Microsoft.Orleans.Streaming.EventHubs" Version="7.2.1" />
     <PackageReference Include="SignalR.Orleans" Version="7.1.0" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.5.0" />
   </ItemGroup>
